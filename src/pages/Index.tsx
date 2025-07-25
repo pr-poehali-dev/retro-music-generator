@@ -237,7 +237,7 @@ const Index = () => {
 
                 {/* Current Track Display */}
                 <Card className="bg-gradient-to-r from-orange-500/20 to-cyan-400/20 border border-white/20">
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 bg-slate-700">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h4 className="text-xl text-white font-bold">{t.nowPlaying}</h4>
