@@ -4,17 +4,139 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+
+const translations = {
+  ru: {
+    title: 'RETRO MUSIC',
+    subtitle: 'GENERATOR',
+    description: 'Generate authentic 8-bit & 16-bit gaming soundtracks',
+    musicGenerator: 'Music Generator',
+    chooseGenre: 'Choose Genre:',
+    nowPlaying: 'Now Playing',
+    currentTrack: 'Pixel Adventure Theme',
+    generateNew: 'Generate New Track',
+    myPlaylist: 'My Playlist',
+    exportPlaylist: 'Export Playlist',
+    home: 'Главная',
+    generator: 'Генератор',
+    playlists: 'Плейлисты',
+    settings: 'Настройки',
+    language: 'Язык',
+    genres: {
+      chiptune: 'Chiptune',
+      arcade: 'Arcade',
+      rpg: 'RPG'
+    },
+    tracks: {
+      chiptune: ['Pixel Quest', '8-Bit Dreams', 'Digital Nostalgia', 'Retro Runner'],
+      arcade: ['Neon Nights', 'High Score', 'Power Up', 'Laser Blast'],
+      rpg: ['Epic Journey', 'Forest Temple', 'Magic Spell', 'Ancient Ruins']
+    }
+  },
+  en: {
+    title: 'RETRO MUSIC',
+    subtitle: 'GENERATOR',
+    description: 'Generate authentic 8-bit & 16-bit gaming soundtracks',
+    musicGenerator: 'Music Generator',
+    chooseGenre: 'Choose Genre:',
+    nowPlaying: 'Now Playing',
+    currentTrack: 'Pixel Adventure Theme',
+    generateNew: 'Generate New Track',
+    myPlaylist: 'My Playlist',
+    exportPlaylist: 'Export Playlist',
+    home: 'Home',
+    generator: 'Generator',
+    playlists: 'Playlists',
+    settings: 'Settings',
+    language: 'Language',
+    genres: {
+      chiptune: 'Chiptune',
+      arcade: 'Arcade',
+      rpg: 'RPG'
+    },
+    tracks: {
+      chiptune: ['Pixel Quest', '8-Bit Dreams', 'Digital Nostalgia', 'Retro Runner'],
+      arcade: ['Neon Nights', 'High Score', 'Power Up', 'Laser Blast'],
+      rpg: ['Epic Journey', 'Forest Temple', 'Magic Spell', 'Ancient Ruins']
+    }
+  },
+  fr: {
+    title: 'MUSIQUE RÉTRO',
+    subtitle: 'GÉNÉRATEUR',
+    description: 'Générez des bandes sonores authentiques de jeux 8-bit et 16-bit',
+    musicGenerator: 'Générateur de Musique',
+    chooseGenre: 'Choisir le Genre:',
+    nowPlaying: 'En Cours',
+    currentTrack: 'Thème Aventure Pixel',
+    generateNew: 'Générer Nouvelle Piste',
+    myPlaylist: 'Ma Playlist',
+    exportPlaylist: 'Exporter Playlist',
+    home: 'Accueil',
+    generator: 'Générateur',
+    playlists: 'Playlists',
+    settings: 'Paramètres',
+    language: 'Langue',
+    genres: {
+      chiptune: 'Chiptune',
+      arcade: 'Arcade',
+      rpg: 'RPG'
+    },
+    tracks: {
+      chiptune: ['Quête Pixel', 'Rêves 8-Bit', 'Nostalgie Numérique', 'Coureur Rétro'],
+      arcade: ['Nuits Néon', 'High Score', 'Power Up', 'Rayon Laser'],
+      rpg: ['Voyage Épique', 'Temple Forêt', 'Sort Magique', 'Ruines Anciennes']
+    }
+  },
+  es: {
+    title: 'MÚSICA RETRO',
+    subtitle: 'GENERADOR',
+    description: 'Genera bandas sonoras auténticas de juegos de 8-bit y 16-bit',
+    musicGenerator: 'Generador de Música',
+    chooseGenre: 'Elegir Género:',
+    nowPlaying: 'Reproduciendo',
+    currentTrack: 'Tema Aventura Pixel',
+    generateNew: 'Generar Nueva Pista',
+    myPlaylist: 'Mi Playlist',
+    exportPlaylist: 'Exportar Playlist',
+    home: 'Inicio',
+    generator: 'Generador',
+    playlists: 'Playlists',
+    settings: 'Configuración',
+    language: 'Idioma',
+    genres: {
+      chiptune: 'Chiptune',
+      arcade: 'Arcade',
+      rpg: 'RPG'
+    },
+    tracks: {
+      chiptune: ['Búsqueda Pixel', 'Sueños 8-Bit', 'Nostalgia Digital', 'Corredor Retro'],
+      arcade: ['Noches Neón', 'Puntuación Alta', 'Power Up', 'Rayo Láser'],
+      rpg: ['Viaje Épico', 'Templo Bosque', 'Hechizo Mágico', 'Ruinas Antiguas']
+    }
+  }
+};
+
+const languages = [
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' }
+];
 
 const Index = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentGenre, setCurrentGenre] = useState('chiptune');
   const [volume, setVolume] = useState(75);
+  const [currentLanguage, setCurrentLanguage] = useState('ru');
   const [playlistTracks, setPlaylistTracks] = useState([
     { id: 1, title: 'Pixel Adventure', genre: 'chiptune', duration: '2:45' },
     { id: 2, title: 'Boss Battle Theme', genre: 'arcade', duration: '3:20' },
     { id: 3, title: 'Village Melody', genre: 'rpg', duration: '4:15' }
   ]);
+  
+  const t = translations[currentLanguage];
 
   const genres = [
     { id: 'chiptune', name: 'Chiptune', color: 'bg-orange-500', icon: 'Gamepad2' },
@@ -27,13 +149,7 @@ const Index = () => {
   };
 
   const generateTrack = () => {
-    const titles = {
-      chiptune: ['Pixel Quest', '8-Bit Dreams', 'Digital Nostalgia', 'Retro Runner'],
-      arcade: ['Neon Nights', 'High Score', 'Power Up', 'Laser Blast'],
-      rpg: ['Epic Journey', 'Forest Temple', 'Magic Spell', 'Ancient Ruins']
-    };
-    
-    const randomTitle = titles[currentGenre][Math.floor(Math.random() * titles[currentGenre].length)];
+    const randomTitle = t.tracks[currentGenre][Math.floor(Math.random() * t.tracks[currentGenre].length)];
     const randomDuration = `${Math.floor(Math.random() * 3) + 2}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
     
     const newTrack = {
@@ -50,14 +166,42 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-4">
       {/* Header */}
       <div className="max-w-6xl mx-auto">
-        <header className="text-center py-8">
+        <header className="text-center py-8 relative">
+          {/* Language Selector */}
+          <div className="absolute top-0 right-0">
+            <Select value={currentLanguage} onValueChange={setCurrentLanguage}>
+              <SelectTrigger className="w-40 bg-black/20 border-cyan-400/30 text-white">
+                <SelectValue>
+                  <div className="flex items-center gap-2">
+                    <span>{languages.find(l => l.code === currentLanguage)?.flag}</span>
+                    <span className="text-sm">{t.language}</span>
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-black/90 border-cyan-400/30">
+                {languages.map((lang) => (
+                  <SelectItem 
+                    key={lang.code} 
+                    value={lang.code}
+                    className="text-white hover:bg-cyan-400/20 focus:bg-cyan-400/20"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           <h1 className="text-6xl font-bold text-white mb-4 tracking-wider" style={{ fontFamily: 'monospace' }}>
-            RETRO MUSIC
+            {t.title}
           </h1>
           <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-cyan-400 mb-2" style={{ fontFamily: 'monospace' }}>
-            GENERATOR
+            {t.subtitle}
           </h2>
-          <p className="text-xl text-gray-300">Generate authentic 8-bit & 16-bit gaming soundtracks</p>
+          <p className="text-xl text-gray-300">{t.description}</p>
         </header>
 
         {/* Main Content */}
@@ -68,13 +212,13 @@ const Index = () => {
               <CardHeader>
                 <CardTitle className="text-2xl text-white flex items-center gap-2">
                   <Icon name="Music" size={28} className="text-orange-400" />
-                  Music Generator
+                  {t.musicGenerator}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Genre Selection */}
                 <div>
-                  <h3 className="text-lg text-white mb-4">Choose Genre:</h3>
+                  <h3 className="text-lg text-white mb-4">{t.chooseGenre}</h3>
                   <div className="flex gap-3 flex-wrap">
                     {genres.map((genre) => (
                       <Button
@@ -85,7 +229,7 @@ const Index = () => {
                                   h-12 px-6 font-semibold text-base transition-all duration-200 hover:scale-105`}
                       >
                         <Icon name={genre.icon} size={20} className="mr-2" />
-                        {genre.name}
+                        {t.genres[genre.id]}
                       </Button>
                     ))}
                   </div>
@@ -96,11 +240,11 @@ const Index = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h4 className="text-xl text-white font-bold">Now Playing</h4>
-                        <p className="text-gray-300">Pixel Adventure Theme</p>
+                        <h4 className="text-xl text-white font-bold">{t.nowPlaying}</h4>
+                        <p className="text-gray-300">{t.currentTrack}</p>
                       </div>
                       <Badge className="bg-orange-500 text-white">
-                        {genres.find(g => g.id === currentGenre)?.name}
+                        {t.genres[currentGenre]}
                       </Badge>
                     </div>
                     
@@ -156,7 +300,7 @@ const Index = () => {
                   className="w-full bg-gradient-to-r from-orange-500 to-cyan-400 hover:from-orange-600 hover:to-cyan-500 text-white font-bold text-lg h-14 transition-all duration-200 hover:scale-105"
                 >
                   <Icon name="Sparkles" size={24} className="mr-2" />
-                  Generate New Track
+                  {t.generateNew}
                 </Button>
               </CardContent>
             </Card>
@@ -168,7 +312,7 @@ const Index = () => {
               <CardHeader>
                 <CardTitle className="text-xl text-white flex items-center gap-2">
                   <Icon name="ListMusic" size={24} className="text-cyan-400" />
-                  My Playlist
+                  {t.myPlaylist}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -188,7 +332,7 @@ const Index = () => {
                       </div>
                       <div className="flex items-center justify-between text-xs">
                         <Badge variant="outline" className="text-gray-300 border-gray-600">
-                          {track.genre}
+                          {t.genres[track.genre]}
                         </Badge>
                         <span className="text-gray-400">{track.duration}</span>
                       </div>
@@ -198,7 +342,7 @@ const Index = () => {
                 
                 <Button variant="outline" className="w-full mt-4 border-white/30 text-white hover:bg-white/10">
                   <Icon name="Download" size={16} className="mr-2" />
-                  Export Playlist
+                  {t.exportPlaylist}
                 </Button>
               </CardContent>
             </Card>
@@ -212,19 +356,19 @@ const Index = () => {
               <TabsList className="grid w-full grid-cols-4 bg-black/30">
                 <TabsTrigger value="home" className="data-[state=active]:bg-orange-500 text-white">
                   <Icon name="Home" size={16} className="mr-2" />
-                  Главная
+                  {t.home}
                 </TabsTrigger>
                 <TabsTrigger value="generator" className="data-[state=active]:bg-cyan-400 text-white">
                   <Icon name="Sparkles" size={16} className="mr-2" />
-                  Генератор
+                  {t.generator}
                 </TabsTrigger>
                 <TabsTrigger value="playlist" className="data-[state=active]:bg-blue-500 text-white">
                   <Icon name="ListMusic" size={16} className="mr-2" />
-                  Плейлисты
+                  {t.playlists}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="data-[state=active]:bg-purple-500 text-white">
                   <Icon name="Settings" size={16} className="mr-2" />
-                  Настройки
+                  {t.settings}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
