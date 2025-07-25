@@ -225,7 +225,7 @@ const Index = () => {
                         key={genre.id}
                         onClick={() => setCurrentGenre(genre.id)}
                         variant={currentGenre === genre.id ? "default" : "outline"}
-                        className={`${currentGenre === genre.id ? genre.color : 'border-gray-600 text-white hover:bg-gray-700'} 
+                        className={`${currentGenre === genre.id ? genre.color : 'border-gray-600 text-white bg-black/40 hover:bg-gray-700'} 
                                   h-12 px-6 font-semibold text-base transition-all duration-200 hover:scale-105`}
                       >
                         <Icon name={genre.icon} size={20} className="mr-2" />
@@ -276,10 +276,10 @@ const Index = () => {
                         >
                           <Icon name={isPlaying ? "Pause" : "Play"} size={20} />
                         </Button>
-                        <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                        <Button variant="outline" className="border-white/30 text-white bg-black/40 hover:bg-white/10">
                           <Icon name="SkipBack" size={16} className="mr-1" />
                         </Button>
-                        <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                        <Button variant="outline" className="border-white/30 text-white bg-black/40 hover:bg-white/10">
                           <Icon name="SkipForward" size={16} className="mr-1" />
                         </Button>
                       </div>
