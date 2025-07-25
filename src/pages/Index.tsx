@@ -340,7 +340,7 @@ const Index = () => {
                   ))}
                 </div>
                 
-                <Button variant="outline" className="w-full mt-4 border-white/30 text-white hover:bg-white/10">
+                <Button variant="outline" className="w-full mt-4 border-white/30 text-white bg-black/40 hover:bg-white/10">
                   <Icon name="Download" size={16} className="mr-2" />
                   {t.exportPlaylist}
                 </Button>
