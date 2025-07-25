@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -125,18 +125,174 @@ const languages = [
   { code: 'es', name: 'Español', flag: '🇪🇸' }
 ];
 
+// Audio Engine Class
+class RetroAudioEngine {
+  constructor() {
+    this.audioContext = null;
+    this.masterGain = null;
+    this.oscillators = [];
+    this.isInitialized = false;
+  }
+
+  async initialize() {
+    if (this.isInitialized) return;
+    
+    try {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.connect(this.audioContext.destination);
+      this.masterGain.gain.value = 0.3;
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize audio:', error);
+    }
+  }
+
+  setVolume(volume) {
+    if (this.masterGain) {
+      this.masterGain.gain.value = volume / 100 * 0.3;
+    }
+  }
+
+  generateChiptuneTrack() {
+    if (!this.audioContext) return;
+    
+    const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88]; // C major scale
+    const duration = 0.3;
+    let currentTime = this.audioContext.currentTime;
+    
+    // Generate 8 random notes
+    for (let i = 0; i < 8; i++) {
+      const frequency = notes[Math.floor(Math.random() * notes.length)];
+      this.playSquareWave(frequency, currentTime, duration);
+      currentTime += duration;
+    }
+  }
+
+  generateArcadeTrack() {
+    if (!this.audioContext) return;
+    
+    const bassNotes = [130.81, 146.83, 164.81]; // Lower octave
+    const leadNotes = [523.25, 587.33, 659.25, 698.46]; // Higher octave
+    const duration = 0.25;
+    let currentTime = this.audioContext.currentTime;
+    
+    // Generate fast-paced arcade style
+    for (let i = 0; i < 12; i++) {
+      const bassFreq = bassNotes[Math.floor(Math.random() * bassNotes.length)];
+      const leadFreq = leadNotes[Math.floor(Math.random() * leadNotes.length)];
+      
+      this.playSawWave(bassFreq, currentTime, duration * 2);
+      this.playSquareWave(leadFreq, currentTime + duration, duration);
+      currentTime += duration * 1.5;
+    }
+  }
+
+  generateRPGTrack() {
+    if (!this.audioContext) return;
+    
+    const melodyNotes = [349.23, 392.00, 440.00, 493.88, 523.25]; // Pentatonic scale
+    const duration = 0.5;
+    let currentTime = this.audioContext.currentTime;
+    
+    // Generate slower, melodic RPG style
+    for (let i = 0; i < 6; i++) {
+      const frequency = melodyNotes[Math.floor(Math.random() * melodyNotes.length)];
+      this.playTriangleWave(frequency, currentTime, duration);
+      currentTime += duration * 0.8;
+    }
+  }
+
+  playSquareWave(frequency, startTime, duration) {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+    
+    this.oscillators.push({ oscillator, gainNode });
+  }
+
+  playSawWave(frequency, startTime, duration) {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(0.08, startTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+    
+    this.oscillators.push({ oscillator, gainNode });
+  }
+
+  playTriangleWave(frequency, startTime, duration) {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(0.12, startTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.masterGain);
+    
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+    
+    this.oscillators.push({ oscillator, gainNode });
+  }
+
+  stopAll() {
+    this.oscillators.forEach(({ oscillator }) => {
+      try {
+        oscillator.stop();
+      } catch (e) {
+        // Oscillator might already be stopped
+      }
+    });
+    this.oscillators = [];
+  }
+}
+
 const Index = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentGenre, setCurrentGenre] = useState('chiptune');
   const [volume, setVolume] = useState(75);
   const [currentLanguage, setCurrentLanguage] = useState('ru');
+  const [currentTrack, setCurrentTrack] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([
     { id: 1, title: 'Pixel Adventure', genre: 'chiptune', duration: '2:45' },
     { id: 2, title: 'Boss Battle Theme', genre: 'arcade', duration: '3:20' },
     { id: 3, title: 'Village Melody', genre: 'rpg', duration: '4:15' }
   ]);
   
+  const audioEngineRef = useRef(new RetroAudioEngine());
   const t = translations[currentLanguage];
+  
+  useEffect(() => {
+    audioEngineRef.current.setVolume(volume);
+  }, [volume]);
 
   const genres = [
     { id: 'chiptune', name: 'Chiptune', color: 'bg-orange-500', icon: 'Gamepad2' },
@@ -144,11 +300,89 @@ const Index = () => {
     { id: 'rpg', name: 'RPG', color: 'bg-blue-500', icon: 'Sword' }
   ];
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+  const initializeAudio = async () => {
+    if (!audioEngineRef.current.isInitialized) {
+      await audioEngineRef.current.initialize();
+    }
   };
 
-  const generateTrack = () => {
+  const togglePlay = async () => {
+    await initializeAudio();
+    
+    if (isPlaying) {
+      audioEngineRef.current.stopAll();
+      setIsPlaying(false);
+    } else {
+      // Generate and play based on current genre
+      switch (currentGenre) {
+        case 'chiptune':
+          audioEngineRef.current.generateChiptuneTrack();
+          break;
+        case 'arcade':
+          audioEngineRef.current.generateArcadeTrack();
+          break;
+        case 'rpg':
+          audioEngineRef.current.generateRPGTrack();
+          break;
+      }
+      setIsPlaying(true);
+      
+      // Auto-stop after track duration
+      setTimeout(() => {
+        setIsPlaying(false);
+      }, currentGenre === 'rpg' ? 3000 : currentGenre === 'arcade' ? 4000 : 2500);
+    }
+  };
+
+  const skipTrack = async (direction) => {
+    await initializeAudio();
+    audioEngineRef.current.stopAll();
+    
+    const genres = ['chiptune', 'arcade', 'rpg'];
+    const currentIndex = genres.indexOf(currentGenre);
+    let newIndex;
+    
+    if (direction === 'forward') {
+      newIndex = (currentIndex + 1) % genres.length;
+    } else {
+      newIndex = currentIndex === 0 ? genres.length - 1 : currentIndex - 1;
+    }
+    
+    setCurrentGenre(genres[newIndex]);
+    
+    if (isPlaying) {
+      setTimeout(() => {
+        switch (genres[newIndex]) {
+          case 'chiptune':
+            audioEngineRef.current.generateChiptuneTrack();
+            break;
+          case 'arcade':
+            audioEngineRef.current.generateArcadeTrack();
+            break;
+          case 'rpg':
+            audioEngineRef.current.generateRPGTrack();
+            break;
+        }
+      }, 100);
+    }
+  };
+
+  const generateTrack = async () => {
+    await initializeAudio();
+    
+    // Play preview of new track
+    switch (currentGenre) {
+      case 'chiptune':
+        audioEngineRef.current.generateChiptuneTrack();
+        break;
+      case 'arcade':
+        audioEngineRef.current.generateArcadeTrack();
+        break;
+      case 'rpg':
+        audioEngineRef.current.generateRPGTrack();
+        break;
+    }
+    
     const randomTitle = t.tracks[currentGenre][Math.floor(Math.random() * t.tracks[currentGenre].length)];
     const randomDuration = `${Math.floor(Math.random() * 3) + 2}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
     
@@ -160,6 +394,38 @@ const Index = () => {
     };
     
     setPlaylistTracks([...playlistTracks, newTrack]);
+    setCurrentTrack(newTrack);
+    
+    // Show visual feedback
+    setIsPlaying(true);
+    setTimeout(() => {
+      setIsPlaying(false);
+    }, currentGenre === 'rpg' ? 3000 : currentGenre === 'arcade' ? 4000 : 2500);
+  };
+  
+  const playTrackFromPlaylist = async (track) => {
+    await initializeAudio();
+    setCurrentGenre(track.genre);
+    setCurrentTrack(track);
+    
+    audioEngineRef.current.stopAll();
+    
+    switch (track.genre) {
+      case 'chiptune':
+        audioEngineRef.current.generateChiptuneTrack();
+        break;
+      case 'arcade':
+        audioEngineRef.current.generateArcadeTrack();
+        break;
+      case 'rpg':
+        audioEngineRef.current.generateRPGTrack();
+        break;
+    }
+    
+    setIsPlaying(true);
+    setTimeout(() => {
+      setIsPlaying(false);
+    }, track.genre === 'rpg' ? 3000 : track.genre === 'arcade' ? 4000 : 2500);
   };
 
   return (
@@ -241,7 +507,7 @@ const Index = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h4 className="text-xl text-white font-bold">{t.nowPlaying}</h4>
-                        <p className="text-gray-300">{t.currentTrack}</p>
+                        <p className="text-gray-300">{currentTrack ? currentTrack.title : t.currentTrack}</p>
                       </div>
                       <Badge className="bg-orange-500 text-white">
                         {t.genres[currentGenre]}
@@ -276,17 +542,32 @@ const Index = () => {
                         >
                           <Icon name={isPlaying ? "Pause" : "Play"} size={20} />
                         </Button>
-                        <Button variant="outline" className="border-white/30 text-white bg-black/40 hover:bg-white/10">
+                        <Button 
+                          onClick={() => skipTrack('back')}
+                          variant="outline" 
+                          className="border-white/30 text-white bg-black/40 hover:bg-white/10"
+                        >
                           <Icon name="SkipBack" size={16} className="mr-1" />
                         </Button>
-                        <Button variant="outline" className="border-white/30 text-white bg-black/40 hover:bg-white/10">
+                        <Button 
+                          onClick={() => skipTrack('forward')}
+                          variant="outline" 
+                          className="border-white/30 text-white bg-black/40 hover:bg-white/10"
+                        >
                           <Icon name="SkipForward" size={16} className="mr-1" />
                         </Button>
                       </div>
                       
                       <div className="flex items-center space-x-2 text-white">
                         <Icon name="Volume2" size={16} />
-                        <Progress value={volume} className="w-20" />
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="100" 
+                          value={volume} 
+                          onChange={(e) => setVolume(parseInt(e.target.value))}
+                          className="w-20 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                        />
                         <span className="text-sm">{volume}%</span>
                       </div>
                     </div>
@@ -326,7 +607,12 @@ const Index = () => {
                         <h4 className="text-white font-medium text-sm group-hover:text-cyan-400 transition-colors">
                           {track.title}
                         </h4>
-                        <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => playTrackFromPlaylist(track)}
+                        >
                           <Icon name="Play" size={12} className="text-white" />
                         </Button>
                       </div>

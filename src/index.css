@@ -99,3 +99,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Volume Slider */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6b35, #4ecdc4);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+}
+
+.slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6b35, #4ecdc4);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+}
+
+.slider::-webkit-slider-track {
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #4b5563 0%, #60a5fa 100%);
+}
+
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #4b5563 0%, #60a5fa 100%);
+}
